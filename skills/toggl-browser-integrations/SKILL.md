@@ -212,9 +212,8 @@ the final string. Forms, simplest → richest:
 
 ```jsonc
 "description": "issueTitle"                          // one resolver by key
-"description": ["#", "number", ": ", "description"]  // array = concatenated; bare strings are literals
-"description": { "resolvers": ["issueKey", " ", "issueTitle"] }   // object form
-"description": [ { "resolvers": [...] }, { "resolvers": [...] } ] // ordered fallbacks: first non-empty wins
+"description": { "resolvers": ["#", "number", ": ", "description"] }  // concatenated; bare strings are literals
+"description": [ { "resolvers": [...] }, { "resolvers": [...] } ]     // ordered fallbacks: first non-empty wins
 ```
 
 Map a Toggl field by naming it directly on the button. The key is the Toggl field,
@@ -252,17 +251,18 @@ the value instead:
 `Support/Jane` into `Jane`. With no capture group the replacement is used literally
 (`"regex": "/issues/", "replace": "Kind:Issue"`). No match produces no value at all.
 
-> **Mapped values are task state, written once.** `project`, `tags` and any custom
-> fields are applied when the backend *creates* the task, never on a later match. So
+> **Mapped values are task state, written once.** `project` and `tags` are applied
+> when the backend *creates* the task, never on a later match. So
 > test a new mapping on an item that has never been tracked, and expect a value that
 > changes upstream (a status moving on) to stay stale on the task. The time entry
 > carries only its own description, start, duration and billable — it shows the
 > project and tags by inheriting them from the task.
 
-> **They also depend on an org setting.** If an admin has turned off *Create missing
-> tasks, projects and tags* in the extension's Integrations screen, the backend only
-> matches what already exists and your mapped values will not appear. Worth checking
-> before debugging a mapping that produces nothing.
+> **An org setting can suppress the *creation* half.** If an admin has turned off
+> *Create missing tasks, projects and tags* in the extension's Integrations screen,
+> missing entities are not created — but existing ones still resolve, so a mapped
+> project that already exists in Toggl still lands. Worth checking before debugging a
+> mapping whose values are absent only for items that are new to Toggl.
 
 > Selector aliasing: any CSS-selector slot (`anchor`, `closest`, `query`, …) accepts
 > `@aliasName` to pull the selector from the top-level `selectors` map.
@@ -338,7 +338,8 @@ can't reliably infer from the DOM:
   actually one row of a list that's currently filtered to one). Otherwise state your
   inference and let the user correct it: "I see 10 cards, so I'll put a button on each —
   shout if you only want it on one."
-- **Metadata** (optional) — project, tags, anything else worth capturing.
+- **Field mapping** (optional) — project and tags. Those are the only fields a button
+  can fill besides the title; there is no general "extra metadata" channel.
 
 Restate your understanding in one or two sentences and get an explicit **confirm**
 before building. This is the gate the whole loop hangs on.
